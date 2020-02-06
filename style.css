@@ -29,6 +29,16 @@ canvas {
   top:-75px;
   border: 5px solid black;
 }
+main {
+  position: relative;
+}
+#lost {
+ position: absolute;
+ top: 90px;
+ left: 450px;
+ color: red;
+ 
+}
 
 button {
   position:relative; 

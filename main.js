@@ -11,12 +11,13 @@ function drawBox(x, y, size, color) {
 }
 
 
-function Crawler(x, y, color, width, height){
+function Crawler(x, y, color, width, height, gap){
     this.x = x;
     this.y = y;
     this.color = color;
     this.width = width;
     this.height = height;
+    this.gap = gap;
     this.alive = true;
     this.render = function() {
         ctx.fillStyle = this.color;
@@ -29,26 +30,32 @@ let trump = new Crawler(100, 300, 'hotpink', 50, 50);
 // create array and push pipes into it
 let pipes = [];
 function createPipes() {
-    let tPipe1 = new Crawler(263, 0, 'black', 80, 200);
+    // alternate top and bottom pipe, even indecies are top, odd are bottom
+
+    let tPipe1 = new Crawler(263, 0, 'black', 80, 200, 6);
     pipes.push(tPipe1);
+    let bPipe1 = new Crawler(263, 650, 'black', 80, -340, 6);
+    pipes.push(bPipe1);
     let tPipe2 = new Crawler(526, 0, 'black', 80, 250);
     pipes.push(tPipe2);
-    var tPipe3 = new Crawler(790, 0, 'black', 80,100);
-    pipes.push(tPipe3);
-    let bPipe1 = new Crawler(263, 650, 'black', 80, -340);
-    pipes.push(bPipe1);
     let bPipe2 = new Crawler(526, 650, 'black', 80, -290);
     pipes.push(bPipe2);
+    var tPipe3 = new Crawler(790, 0, 'black', 80,100);
+    pipes.push(tPipe3);
     let bPipe3 = new Crawler(790, 650, 'black', 80, -440);
     pipes.push(bPipe3);
+    let tPipe4 = new Crawler(1053, 0, 'black', 80,300);
+    pipes.push(tPipe4);
+    let bPipe4 = new Crawler(1053, 650, 'black', 80, -240);
+    pipes.push(bPipe4);
     
     
-    // loop thru array and render pipes
-    for (let i = 0; i < pipes.length; i++) {
-        pipes[i].render();
-    }
-
+   
 }
+
+function getRndInteger(min, max) {
+    return Math.floor(Math.random() * (max - min + 1) ) + min;
+  }
 
 
 
@@ -76,7 +83,19 @@ function movementHandler(e) {
 document.addEventListener('keydown', movementHandler);
 // Call function that makes all pipes
 createPipes();
-let pipeCopy = pipes;
+let pipeCopy = [...pipes];
+
+function lost() {
+//stop game
+clearInterval(runGame);
+ // have words come on top
+ let lost = document.getElementById("lost")
+ lost.textContent = "IMPEACHED!!!";
+ 
+}
+
+
+
 function gameLoop() {
     
     ctx.clearRect(0, 0, game.width, game.height);
@@ -84,25 +103,70 @@ function gameLoop() {
     pipes.forEach((pipe, i) => {
         // pipes[i].update(); can use this to call a function (that you have to write) to update your pipes every loop of the game and make them move from right to left
 
-    pipes[i].x--;
-    if(pipes[i].x == 110){
-        let newPipe = new Crawler(790, 0, 'black', 80,100);
-        
-        pipes.push(newPipe);
-    }
+        // moves pipe left
+        pipes[i].x--;
 
-    if(pipes[i].x == 110){
-        let newPipe = new Crawler(790, 650, 'black', 80, -440);
+        // checks to see that the pipes width is passed 0
+        if(pipes[i].x + pipes[i].width < 0){
+            
+            
+           // checks if even
+            if (i%2 === 0){
+                // lets the pipe start outside the canvas
+                let newTopPipe = new Crawler(990, 0, 'black', 80, getRndInteger(200, 300));
+                pipes[i] = newTopPipe;
+            }
+            
+            // checks if odd
+            if (i%2 != 0) {
+                // lets the pipe start outside the canvas
+                let newBottomPipe = new Crawler(990, 650, 'black', 80, getRndInteger(-300, -170));
+                pipes[i] = newBottomPipe; 
+            }
+        }
+            
+        pipe.render();
+        if (hitD(pipe, i)){
+            lost(); 
+        }
         
-        pipes.push(newPipe);
-    }
-    
-        
-    pipe.render();
     })
+    //console.log(pipes.length)
 }
 
-let runGame = setInterval(gameLoop, 20);
+function hitD(currPipe, index){
+    // if trump x is = to pipe x 
+    if (trump.x === currPipe.x) {
+        if (index % 2 === 0) {
+            if (trump.x < currPipe.x + currPipe.width
+                && trump.x + trump.width > currPipe.x
+                && trump.y < currPipe.y + currPipe.height
+                && trump.y + trump.height > currPipe.y){
+                 console.log("in conditional");  
+                return true;
+            }
+            
+        } else if (index % 2 != 0) {
+            if (trump.y >= currPipe.y + currPipe.height && trump.y <= 555) {
+                 console.log("testing is this even working");
+                return true;
+            }
+        }
+        return false;
+    }
+          
+
+    
+                
+
+    }   
+
+    
+
+
+
+
+let runGame = setInterval(gameLoop, 5);
 
 
 
