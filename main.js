@@ -1,5 +1,4 @@
 let game = document.getElementById('game');
-
 let ctx = game.getContext('2d');
 
 
@@ -40,7 +39,6 @@ let trump = new Crawler(100, 300, "white", 90, 90, "trump.png");
 let pipes = [];
 function createPipes() {
     // alternate top and bottom pipe, even indecies are top, odd are bottom
-
     let tPipe1 = new Crawler(263, 0, 'black', 80, 200, "nan.jpeg");
     pipes.push(tPipe1);
     let bPipe1 = new Crawler(263, 650, 'black', 80, -340, "nan.jpeg");
@@ -56,21 +54,14 @@ function createPipes() {
     let tPipe4 = new Crawler(1053, 0, 'black', 80,300, "nan.jpeg");
     pipes.push(tPipe4);
     let bPipe4 = new Crawler(1053, 650, 'black', 80, -240, "nan.jpeg");
-    pipes.push(bPipe4);
-    
-    
-   
+    pipes.push(bPipe4); 
 }
 
 function getRndInteger(min, max) {
     return Math.floor(Math.random() * (max - min + 1) ) + min;
   }
-
-
-
 // Render main character
 trump.render();
-
 
 function movementHandler(e) {
     switch (e.keyCode) {
@@ -94,45 +85,28 @@ document.addEventListener('keydown', movementHandler);
 createPipes();
 let pipeCopy = [...pipes];
 
-function lost() {
-//stop game
-clearInterval(runGame);
- // have words come on top
- let lost = document.getElementById("lost")
- lost.textContent = "IMPEACHED!!!";
- 
-}
 
 
- function gameStart() {
-   let start =  document.getElementById("start").addEventListener("click");
- }
+let start =  document.getElementById("start").addEventListener("click", runGame);
+let reset =  document.getElementById("overA").addEventListener("click", restGame);
+
 
 
 function gameLoop() {
-
-
-    
     ctx.clearRect(0, 0, game.width, game.height);
     trump.render();
     pipes.forEach((pipe, i) => {
         // pipes[i].update(); can use this to call a function (that you have to write) to update your pipes every loop of the game and make them move from right to left
-
-        // moves pipe left
-        
+        // moves pipe left 
         pipes[i].x--;
-
         // checks to see that the pipes width is passed 0
         if(pipes[i].x + pipes[i].width < 0){
-            
-            
-           // checks if even
+            // checks if even
             if (i%2 === 0){
                 // lets the pipe start outside the canvas
                 let newTopPipe = new Crawler(990, 0, 'black', 80, getRndInteger(200, 300), "nan.jpeg");
                 pipes[i] = newTopPipe;
             }
-            
             // checks if odd
             if (i%2 != 0) {
                 // lets the pipe start outside the canvas
@@ -140,14 +114,11 @@ function gameLoop() {
                 pipes[i] = newBottomPipe; 
             }
         }
-            
         pipe.render();
         if (hitD(pipe, i)){
             lost(); 
         }
-        
     })
-    //console.log(pipes.length)
 }
 
 function hitD(currPipe, index){
@@ -163,26 +134,32 @@ function hitD(currPipe, index){
             }
             
         } else if (index % 2 != 0) {
-            if (trump.y >= currPipe.y + currPipe.height && trump.y <= 555) {
+            if (trump.y >= currPipe.y + currPipe.height - 70 && trump.x <= 550) {
                  console.log("testing is this even working");
                 return true;
             }
         }
-        return false;
+        
+    }     
+
+}   
+
+function lost() {
+    //stop game
+        clearInterval(runningGame);
+     // have words come on top
+        let lost = document.getElementById("lost")
+        lost.textContent = "IMPEACHED!!!";
+
+        
     }
-          
 
-    
-                
+    function restGame() {
+        location.reload();
+    }
+function runGame (){
 
-    }   
-
-    
-
-
-
-
-let runGame = setInterval(gameLoop, 5);
-
-
+    runningGame = setInterval(gameLoop, 10);
+    document.getElementById("start").removeEventListener("click", runGame);
+}
 
